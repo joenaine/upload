@@ -1,11 +1,39 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:googleauth/firebase_options.dart';
-import 'package:googleauth/screens/welcome.screen..dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/services.dart';
+import 'package:googleauth/constants/firebase_consts.dart';
+import 'package:googleauth/pages/registration/provider/register_provider.dart';
+import 'package:provider/provider.dart';
 
-void main() async {
+import 'constants/app_colors_const.dart';
+import 'constants/app_styles_const.dart';
+import 'pages/login_screen.dart';
+
+final user = authInstance.currentUser;
+int? accountType;
+
+Future<void> geAccountType() async {
+  await FirebaseFirestore.instance
+      .collection('Users')
+      .doc(user?.uid)
+      .get()
+      .then((value) {
+    accountType = value.data()?["accountType"];
+  });
+}
+
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  if (user != null) {
+    await geAccountType();
+  }
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+        statusBarColor: AppColors.white,
+        statusBarIconBrightness: Brightness.dark),
+  );
   runApp(const MyApp());
 }
 
@@ -15,21 +43,30 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => RegisterProvider()),
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'izidos',
+        theme: ThemeData(
+            highlightColor: Colors.transparent,
+            splashColor: Colors.transparent,
+            appBarTheme: const AppBarTheme(
+                centerTitle: true,
+                elevation: 0.5,
+                backgroundColor: AppColors.white,
+                toolbarTextStyle: AppStyles.s14w400,
+                titleTextStyle: AppStyles.s16w500,
+                iconTheme: IconThemeData(color: AppColors.dark)),
+            primarySwatch: Colors.blue,
+            primaryColor: AppColors.primary,
+            fontFamily: 'Inter',
+            backgroundColor: AppColors.bg,
+            iconTheme: const IconThemeData(color: AppColors.dark)),
+        home: const Login(),
       ),
-      home: const WelcomeScreen(),
     );
   }
 }

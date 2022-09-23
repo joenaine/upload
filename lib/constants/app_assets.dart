@@ -1,0 +1,93 @@
+abstract class AppAssets {
+  static const images = _Images();
+  static const svg = _Svg();
+}
+
+class _Images {
+  const _Images();
+  final String shield = 'assets/images/shield.png';
+  final String form = 'assets/images/form.png';
+  final String bitmap = 'assets/images/bitmap.png';
+  final String photo = 'assets/images/photo.png';
+}
+
+class _Svg {
+  const _Svg();
+  final String mappin = 'assets/icons/mappin.svg';
+  final String notification = 'assets/icons/notification_icon.svg';
+  final String house = 'assets/icons/house.svg';
+  final String handshake = 'assets/icons/handshake.svg';
+  final String pluscircle = 'assets/icons/pluscircle.svg';
+  final String users = 'assets/icons/users.svg';
+  final String calendarblank = 'assets/icons/calendarblank.svg';
+  final String watch = 'assets/icons/watch.svg';
+  final String uploadSimple = 'assets/icons/UploadSimple.svg';
+  final String arrowleft = 'assets/icons/careleft.svg';
+  final String arrowright = 'assets/icons/caretRight.svg';
+  final String whiteplayer = 'assets/icons/whiteplayer.svg';
+  final String redplayer = 'assets/icons/redplayer.svg';
+  final String blueplayer = 'assets/icons/blueplayer.svg';
+  final String yellowplayer = 'assets/icons/yellowplayer.svg';
+  final String purpleplayer = 'assets/icons/purpleplayer.svg';
+  final String orangeplayer = 'assets/icons/orangeplayer.svg';
+  final String greenplayer = 'assets/icons/greenplayer.svg';
+  final String grayplayer = 'assets/icons/grayplayer.svg';
+  final String darkplayer = 'assets/icons/darkplayer.svg';
+  final String darkblueplayer = 'assets/icons/darkblueplayer.svg';
+  final String search = 'assets/icons/search.svg';
+  final String filter = 'assets/icons/filter.svg';
+  final String eye = 'assets/icons/Eye.svg';
+  final String eyeSlash = 'assets/icons/EyeSlash.svg';
+  final String check = 'assets/icons/Check.svg';
+  final String calendar = 'assets/icons/Calendar.svg';
+  final String dotsthree = 'assets/icons/dotsthree.svg';
+  final String xcircle = 'assets/icons/XCircle.svg';
+  final String searchSmall = 'assets/icons/search_small.svg';
+  final String plus = 'assets/icons/plus.svg';
+  final String minus = 'assets/icons/minus.svg';
+  final String money = 'assets/icons/money.svg';
+  final String globe = 'assets/icons/globe.svg';
+  final String copy = 'assets/icons/copy.svg';
+  final String download = 'assets/icons/download.svg';
+  final String thumbsup = 'assets/icons/thumbsup.svg';
+  final String star = 'assets/icons/star.svg';
+  final String faq = 'assets/icons/faq.svg';
+  final String notif = 'assets/icons/notif.svg';
+  final String oferta = 'assets/icons/oferta.svg';
+  final String shield = 'assets/icons/shield.svg';
+  final String support = 'assets/icons/support.svg';
+  final String phone = 'assets/icons/phone.svg';
+  final String email = 'assets/icons/email.svg';
+  final String password = 'assets/icons/password.svg';
+  final String telegram = 'assets/icons/TelegramLogo.svg';
+  final String facebook = 'assets/icons/FacebookLogo.svg';
+  final String instagram = 'assets/icons/InstagramLogo.svg';
+  final String linkedin = 'assets/icons/LinkedinLogo.svg';
+  final String gametype = 'assets/icons/gametype.svg';
+  final String note = 'assets/icons/note.svg';
+  final String handshakeColor = 'assets/icons/handshake_color.svg';
+  final String message = 'assets/icons/message.svg';
+  final String bell = 'assets/icons/bell.svg';
+  final String hockey = 'assets/icons/hockey.svg';
+  final String success = 'assets/icons/success.svg';
+  final String profile = 'assets/images/unselected_user.svg';
+  final String unselectedAvatar = 'assets/images/bitmap.svg';
+  final String logo = 'assets/icons/logo.svg';
+  final String pageindicator1 = 'assets/icons/page_indicator1.svg';
+  final String pageindicator2 = 'assets/icons/page_indicator2.svg';
+  final String divider = 'assets/icons/Divider.svg';
+  final String important = 'assets/icons/important.svg';
+  final String cap = 'assets/icons/cap.svg';
+  final String light = 'assets/icons/light.svg';
+  final String backCard = 'assets/icons/back_side_card.svg';
+  final String frontCard = 'assets/icons/front_side_card.svg';
+  final String faceRecog = 'assets/icons/face_recognition.svg';
+  final String arrowdown = 'assets/icons/arrowdown.svg';
+  final String arrowup = 'assets/icons/arrowup.svg';
+  final String verificationLogo = 'assets/icons/verification_logo.svg';
+  final String checkboxActive = 'assets/icons/checkbox_active.svg';
+  final String checkboxInactive = 'assets/icons/checkbox_inactive.svg';
+  final String paymentGreen = 'assets/icons/status_payment_green.svg';
+  final String paymentYellow = 'assets/icons/status_payment_yellow.svg';
+  final String moreDotsVertical = 'assets/icons/dots_more_vertical.svg';
+}
