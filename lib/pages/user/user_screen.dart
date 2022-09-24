@@ -11,7 +11,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:googleauth/constants/app_colors_const.dart';
 import 'package:googleauth/constants/firebase_consts.dart';
 import 'package:googleauth/widgets/container16.dart';
-import 'package:googleauth/widgets/discolored_button.dart';
 import 'package:googleauth/widgets/modal_bottom.dart';
 import 'package:googleauth/widgets/toast.dart';
 
@@ -19,6 +18,7 @@ import '../../Generators/uui_generator.dart';
 import '../../constants/app_assets.dart';
 import '../../constants/app_styles_const.dart';
 import '../../constants/screen_navigation_const.dart';
+import '../../widgets/general_button.dart';
 import '../login_screen.dart';
 
 class UserScreen extends StatefulWidget {
@@ -29,6 +29,7 @@ class UserScreen extends StatefulWidget {
 }
 
 class _UserScreenState extends State<UserScreen> {
+  bool isLoading = false;
   late FToast fToast;
   String docId = UUIDGenerator().uuidV4();
   final user = authInstance.currentUser;
@@ -38,6 +39,9 @@ class _UserScreenState extends State<UserScreen> {
   PlatformFile? pickedFile;
   UploadTask? uploadTask;
   Future uploadFile() async {
+    setState(() {
+      isLoading = true;
+    });
     final path = 'files/${user?.uid}/$docId';
     final file = File(pickedFile!.path!);
 
@@ -47,6 +51,7 @@ class _UserScreenState extends State<UserScreen> {
 
     final urlDownload = await snapshot.ref.getDownloadURL();
     addPostToFireStore(urlDownload);
+    addPostToListOfGrants(urlDownload);
     print('Download Link: $urlDownload');
   }
 
@@ -64,6 +69,40 @@ class _UserScreenState extends State<UserScreen> {
     setState(() {
       pickedFile = result.files.first;
     });
+  }
+
+  Future<void> addPostToListOfGrants(String doc) async {
+    firestoreInstance.collection('grants').doc(docId).set({
+      'userID': userProfileID,
+      'docID': docId,
+      'doc': doc,
+      'postedDate': Timestamp.now(),
+      'docName': pickedFile!.name
+    }).then(
+      (value) {
+        setState(() {
+          isLoading = false;
+        });
+        fToast.showToast(
+          child: const ToastContainer(text: "Успешно загружено"),
+          gravity: ToastGravity.BOTTOM,
+          toastDuration: const Duration(seconds: 2),
+        );
+        changeScreenByRemove(context, const UserScreen(), '/user');
+      },
+    ).catchError(
+      (error) {
+        setState(() {
+          isLoading = false;
+        });
+        fToast.showToast(
+          child: const ToastContainer(
+              text: "Произошла ошибка", color: AppColors.error),
+          gravity: ToastGravity.BOTTOM,
+          toastDuration: const Duration(seconds: 2),
+        );
+      },
+    );
   }
 
   Future<void> addPostToFireStore(String doc) async {
@@ -108,8 +147,12 @@ class _UserScreenState extends State<UserScreen> {
           const Text('Welcome User'),
           if (pickedFile != null) Text(pickedFile!.name),
           Container16(
-              child:
-                  DiscoloredButton(text: 'Загрузить', onPressed: uploadFile)),
+              child: GeneralButton(
+                  isLoading: isLoading,
+                  text: 'Загрузить',
+                  onPressed: () {
+                    uploadFile();
+                  })),
           GestureDetector(
             onTap: (() {
               FlexibleBottomSheet.flexBottomSheet(context, 0, 0, [
