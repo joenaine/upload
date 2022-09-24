@@ -13,6 +13,15 @@ import 'pages/login_screen.dart';
 
 final user = authInstance.currentUser;
 int? accountType;
+Timestamp? createdAt;
+String? email;
+String? firstname;
+String? id;
+String? iin;
+String? lastname;
+String? middlename;
+String? password;
+String? phone;
 
 Future<void> geAccountType() async {
   await FirebaseFirestore.instance
@@ -21,6 +30,15 @@ Future<void> geAccountType() async {
       .get()
       .then((value) {
     accountType = value.data()?["accountType"];
+    createdAt = value.data()?["createdAt"];
+    email = value.data()?["email"];
+    firstname = value.data()?["firstname"];
+    id = value.data()?["id"];
+    iin = value.data()?["iin"];
+    lastname = value.data()?["lastname"];
+    middlename = value.data()?["middlename"];
+    password = value.data()?["password"];
+    phone = value.data()?["phone"];
   });
 }
 

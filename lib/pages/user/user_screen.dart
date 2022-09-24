@@ -90,7 +90,8 @@ class _UserScreenState extends State<UserScreen> {
       'postedDate': Timestamp.now(),
       'docName': pickedFile!.name,
       'projectName': projectNameC.text,
-      'desc': descC.text
+      'desc': descC.text,
+      'estimates': []
     }).then(
       (value) {
         setState(() {

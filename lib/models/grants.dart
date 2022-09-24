@@ -8,7 +8,7 @@ class GrantsModel {
   final Timestamp? postedDate;
   final String? projectName;
   final String? desc;
-  final List<dynamic>? estimates;
+  final List? estimates;
 
   GrantsModel(
       {this.doc,

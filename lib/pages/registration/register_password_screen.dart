@@ -56,8 +56,8 @@ class _PasswordRegistrationState extends State<PasswordRegistration> {
               password: password.text.trim());
       final User? user = authInstance.currentUser;
       final uid = user!.uid;
-      // user.updateDisplayName(regP.firstname.text);
-      // user.reload();
+      user.updateDisplayName(regP.firstname.text);
+      user.reload();
       await FirebaseFirestore.instance.collection('users').doc(uid).set({
         'id': uid,
         'accountType': regP.accountType != AccountType.third

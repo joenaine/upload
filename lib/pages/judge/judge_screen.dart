@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:googleauth/constants/firebase_consts.dart';
 import 'package:googleauth/models/grants.dart';
+import 'package:googleauth/models/user_model.dart';
 import 'package:googleauth/pages/judge/judge_project_details.dart';
 import 'package:googleauth/widgets/app_global_loader_widget.dart';
 
@@ -12,13 +13,51 @@ import '../../constants/screen_navigation_const.dart';
 import '../login_screen.dart';
 
 class JudgeScreen extends StatefulWidget {
-  const JudgeScreen({Key? key}) : super(key: key);
+  const JudgeScreen({Key? key, this.userModelClass}) : super(key: key);
+  final UserModelClass? userModelClass;
 
   @override
   State<JudgeScreen> createState() => _JudgeScreenState();
 }
 
 class _JudgeScreenState extends State<JudgeScreen> {
+  final user = authInstance.currentUser;
+  int? accountType;
+  Timestamp? createdAt;
+  String? email;
+  String? firstname;
+  String? id;
+  String? iin;
+  String? lastname;
+  String? middlename;
+  String? password;
+  String? phone;
+
+  Future<void> _geAccountType() async {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user?.uid)
+        .get()
+        .then((value) {
+      accountType = value.data()?["accountType"];
+      createdAt = value.data()?["createdAt"];
+      email = value.data()?["email"];
+      firstname = value.data()?["firstname"];
+      id = value.data()?["id"];
+      iin = value.data()?["iin"];
+      lastname = value.data()?["lastname"];
+      middlename = value.data()?["middlename"];
+      password = value.data()?["password"];
+      phone = value.data()?["phone"];
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _geAccountType();
+  }
+
   Widget grantsCard() {
     return SizedBox(
       height: MediaQuery.of(context).size.height * 0.75,
@@ -76,7 +115,12 @@ class _JudgeScreenState extends State<JudgeScreen> {
             splashColor: Colors.blue.withAlpha(30),
             onTap: () {
               changeScreen(
-                  context, JudgeProjectDetails(grantsModel: grantsModel));
+                  context,
+                  JudgeProjectDetails(
+                      grantsModel: grantsModel,
+                      firstname: firstname,
+                      middlename: middlename,
+                      lastname: lastname));
             },
             child: snapshot.data?.docs.length == null
                 ? Container()
@@ -86,19 +130,23 @@ class _JudgeScreenState extends State<JudgeScreen> {
                         width: 10.0,
                       ),
                       Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(grantsModel.userID!, style: AppStyles.s10w400),
-                            Text(grantsModel.projectName!,
-                                style: AppStyles.s14w400),
-                            Text(grantsModel.desc!, style: AppStyles.s14w400),
-                            const SizedBox(
-                              height: 5.0,
-                            ),
-                          ],
+                        child: Container(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(grantsModel.userID!,
+                                  style: AppStyles.s10w400),
+                              Text(grantsModel.projectName!,
+                                  style: AppStyles.s14w400),
+                              Text(grantsModel.desc!, style: AppStyles.s14w400),
+                              const SizedBox(
+                                height: 5.0,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ],
@@ -126,7 +174,7 @@ class _JudgeScreenState extends State<JudgeScreen> {
                   // ignore: use_build_context_synchronously
                   changeScreenByRemove(context, const Login(), '/login');
                 },
-                child: const Text('Выйти'))
+                child: const Text('Выйти')),
           ],
         ),
       ),

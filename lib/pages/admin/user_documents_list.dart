@@ -1,9 +1,14 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:googleauth/constants/app_styles_const.dart';
 import 'package:googleauth/models/grants.dart';
 import 'package:googleauth/widgets/app_global_loader_widget.dart';
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../../constants/app_assets.dart';
 
@@ -16,6 +21,37 @@ class UserDocumentsList extends StatefulWidget {
 }
 
 class _UserDocumentsListState extends State<UserDocumentsList> {
+  Future openFile({required String url, String? filename}) async {
+    final name = filename ?? url.split('/').last;
+    final file = await downloadFile(url, name);
+    if (file == null) return;
+
+    print(file.path);
+    OpenFile.open(file.path);
+  }
+
+  Future<File?> downloadFile(String url, String name) async {
+    final appStorage = await getApplicationDocumentsDirectory();
+    final file = File('${appStorage.path}/$name');
+
+    try {
+      final response = await Dio().get(
+        url,
+        options: Options(
+            responseType: ResponseType.bytes,
+            followRedirects: false,
+            receiveTimeout: 0),
+      );
+      final raf = file.openSync(mode: FileMode.write);
+      raf.writeFromSync(response.data);
+      await raf.close();
+
+      return file;
+    } catch (e) {
+      return null;
+    }
+  }
+
   _trashPickersList() {
     return SizedBox(
       height: MediaQuery.of(context).size.height * 0.75,
@@ -78,40 +114,50 @@ class _UserDocumentsListState extends State<UserDocumentsList> {
             onTap: () {},
             child: snapshot.data?.docs.length == null
                 ? Container()
-                : Row(
+                : Wrap(
                     children: [
                       const SizedBox(
                         width: 10.0,
                       ),
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () {
-                            // changeScreen(context, const UserDocumentsList());
-                          },
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(grant.docName!, style: AppStyles.s14w400),
-                              const SizedBox(
-                                height: 5.0,
-                              ),
-                              Text(
-                                grant.doc!,
-                                textAlign: TextAlign.start,
-                                style: AppStyles.s14w400,
-                              ),
-                              ListView.builder(
-                                shrinkWrap: true,
-                                itemCount: grant.estimates?.length,
-                                itemBuilder: (BuildContext context, int index) {
-                                  var data = grant.estimates?[index];
-                                  return Text(data.actualR);
+                      GestureDetector(
+                        onTap: () {
+                          // changeScreen(context, const UserDocumentsList());
+                        },
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(grant.projectName!, style: AppStyles.s14w400),
+                            const SizedBox(height: 5.0),
+                            InkWell(
+                                onTap: () {
+                                  // UrlL.openUrl(widget.grantsModel!.doc!);
+                                  openFile(url: grant.doc!);
                                 },
-                              ),
-                            ],
-                          ),
+                                child: Image.asset(
+                                  AppAssets.images.doc,
+                                  height: 86,
+                                )),
+                            ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: grant.estimates?.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                var item = grant.estimates?[index];
+                                return Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    Text('${item['judgeName']}     '),
+                                    Text(item['ideaR'].toString()),
+                                    const SizedBox(width: 20),
+                                    Text(item['actualR'].toString()),
+                                    Text(item['planR'].toString()),
+                                  ],
+                                );
+                              },
+                            ),
+                          ],
                         ),
                       ),
                     ],

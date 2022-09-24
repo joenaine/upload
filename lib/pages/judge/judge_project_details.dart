@@ -18,8 +18,17 @@ import '../../constants/firebase_consts.dart';
 import '../../widgets/toast.dart';
 
 class JudgeProjectDetails extends StatefulWidget {
-  const JudgeProjectDetails({Key? key, this.grantsModel}) : super(key: key);
+  const JudgeProjectDetails(
+      {Key? key,
+      this.grantsModel,
+      this.firstname,
+      this.middlename,
+      this.lastname})
+      : super(key: key);
   final GrantsModel? grantsModel;
+  final String? firstname;
+  final String? middlename;
+  final String? lastname;
 
   @override
   State<JudgeProjectDetails> createState() => _JudgeProjectDetailsState();
@@ -85,6 +94,10 @@ class _JudgeProjectDetailsState extends State<JudgeProjectDetails> {
           'ideaR': ratingIdea,
           'planR': ratingPlan,
           'judgeID': userProfileID,
+          'judgeName': widget.firstname,
+          'judgeMiddlename': widget.middlename,
+          'judgeLastname': widget.lastname,
+          'estimates': []
         }
       ])
     }).then(
