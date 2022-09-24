@@ -3,11 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:googleauth/constants/app_assets.dart';
 import 'package:googleauth/constants/app_styles_const.dart';
-import 'package:googleauth/models/grants.dart';
+import 'package:googleauth/pages/admin/user_documents_list.dart';
 import 'package:googleauth/widgets/app_global_loader_widget.dart';
 
 import '../../constants/firebase_consts.dart';
 import '../../constants/screen_navigation_const.dart';
+import '../../models/user_model.dart';
 import '../login_screen.dart';
 
 class AdminScreen extends StatefulWidget {
@@ -53,11 +54,11 @@ class _AdminScreenState extends State<AdminScreen> {
                   : ListView.builder(
                       scrollDirection: Axis.vertical,
                       physics: const BouncingScrollPhysics(),
-                      itemCount: snapshot.data.docs.length,
+                      itemCount: snapshot.data!.docs.length,
                       itemBuilder: (BuildContext context, int index) {
                         UserModelClass userModelClass =
                             UserModelClass.fromDocument(
-                                snapshot.data.docs[index]);
+                                snapshot.data!.docs[index]);
                         return trashPickersDetailsCard(
                             snapshot, userModelClass);
                       },
@@ -67,21 +68,62 @@ class _AdminScreenState extends State<AdminScreen> {
     );
   }
 
-  getAllTrashPickUps() {
-    FirebaseFirestore.instance.collection("users").get().then((querySnapshot) {
-      for (var result in querySnapshot.docs) {
-        FirebaseFirestore.instance
-            .collection("users")
-            .doc(result.id)
-            .collection("Grants")
-            .get()
-            .then((querySnapshot) {
-          for (var result in querySnapshot.docs) {
-            GrantsModel grantsModel = GrantsModel.fromDocument(result);
-          }
-        });
-      }
-    });
+  Widget trashPickersDetailsCard(
+      AsyncSnapshot<QuerySnapshot> snapshot, UserModelClass userModelClass) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+      child: Container(
+        child: GestureDetector(
+          child: Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            color: Colors.grey.shade100,
+            child: InkWell(
+              splashColor: Colors.blue.withAlpha(30),
+              onTap: () {},
+              child: snapshot.data?.docs.length == null
+                  ? Container()
+                  : Row(
+                      children: [
+                        const SizedBox(
+                          width: 10.0,
+                        ),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () {
+                              changeScreen(
+                                  context,
+                                  UserDocumentsList(
+                                    userId: userModelClass.id,
+                                  ));
+                            },
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(userModelClass.firstname!,
+                                    style: AppStyles.s14w400),
+                                const SizedBox(
+                                  height: 5.0,
+                                ),
+                                Text(
+                                  userModelClass.phone!,
+                                  textAlign: TextAlign.start,
+                                  style: AppStyles.s14w400,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -92,6 +134,7 @@ class _AdminScreenState extends State<AdminScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Text('Welcome Admin'),
+          _trashPickersList(),
           ElevatedButton(
               onPressed: () async {
                 await authInstance.signOut();

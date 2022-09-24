@@ -116,6 +116,7 @@ class _UserScreenState extends State<UserScreen> {
                 GestureDetector(
                     onTap: () {
                       selectFile();
+                      Navigator.pop(context);
                     },
                     child: const Text('Выбрать файл', style: AppStyles.s16w400))
               ]);
