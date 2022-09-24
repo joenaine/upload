@@ -81,7 +81,13 @@ class _AdminScreenState extends State<AdminScreen> {
             color: Colors.grey.shade100,
             child: InkWell(
               splashColor: Colors.blue.withAlpha(30),
-              onTap: () {},
+              onTap: () {
+                changeScreen(
+                    context,
+                    UserDocumentsList(
+                      userId: userModelClass.id,
+                    ));
+              },
               child: snapshot.data?.docs.length == null
                   ? Container()
                   : Row(
@@ -90,31 +96,22 @@ class _AdminScreenState extends State<AdminScreen> {
                           width: 10.0,
                         ),
                         Expanded(
-                          child: GestureDetector(
-                            onTap: () {
-                              changeScreen(
-                                  context,
-                                  UserDocumentsList(
-                                    userId: userModelClass.id,
-                                  ));
-                            },
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(userModelClass.firstname!,
-                                    style: AppStyles.s14w400),
-                                const SizedBox(
-                                  height: 5.0,
-                                ),
-                                Text(
-                                  userModelClass.phone!,
-                                  textAlign: TextAlign.start,
-                                  style: AppStyles.s14w400,
-                                ),
-                              ],
-                            ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(userModelClass.firstname!,
+                                  style: AppStyles.s14w400),
+                              const SizedBox(
+                                height: 5.0,
+                              ),
+                              Text(
+                                userModelClass.phone!,
+                                textAlign: TextAlign.start,
+                                style: AppStyles.s14w400,
+                              ),
+                            ],
                           ),
                         ),
                       ],

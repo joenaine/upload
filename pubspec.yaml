@@ -30,6 +30,7 @@ dependencies:
   bottom_sheet: 3.1.1
   cloud_firestore: ^3.4.8
   cupertino_icons: ^1.0.2
+  dio: ^4.0.6
   dotted_border: 2.0.0+2
   file_picker: ^4.5.1
   firebase_auth: ^3.9.0
@@ -37,23 +38,20 @@ dependencies:
   firebase_storage: ^10.3.9
   flutter:
     sdk: flutter
+  flutter_rating_bar: ^4.0.1
   flutter_signin_button: ^2.0.0
   flutter_svg: 1.0.3
   fluttertoast: 8.0.9
   google_sign_in: ^5.4.1
   mask_text_input_formatter: 2.4.0
   modal_bottom_sheet: 2.1.0
+  open_file: ^3.2.1
+  path_provider: ^2.0.11
   provider: 6.0.3
   url_launcher: 6.1.5
   uuid: 3.0.6
 
 dev_dependencies:
-
-  # The "flutter_lints" package below contains a set of recommended lints to
-  # encourage good coding practices. The lint set provided by the package is
-  # activated in the `analysis_options.yaml` file located at the root of your
-  # package. See that file for information about deactivating specific lint
-  # rules and activating additional ones.
   flutter_lints: ^2.0.0
   flutter_test:
     sdk: flutter

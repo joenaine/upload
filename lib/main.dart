@@ -65,6 +65,7 @@ class _MyAppState extends State<MyApp> {
         debugShowCheckedModeBanner: false,
         title: 'grant',
         theme: ThemeData(
+            scaffoldBackgroundColor: AppColors.bg,
             highlightColor: Colors.transparent,
             splashColor: Colors.transparent,
             appBarTheme: const AppBarTheme(

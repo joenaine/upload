@@ -21,9 +21,8 @@ class _UserDocumentsListState extends State<UserDocumentsList> {
       height: MediaQuery.of(context).size.height * 0.75,
       child: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
-            .collection("users")
-            .doc(widget.userId)
-            .collection('Grants')
+            .collection("grants")
+            .where('userID', isEqualTo: widget.userId)
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -102,6 +101,14 @@ class _UserDocumentsListState extends State<UserDocumentsList> {
                                 grant.doc!,
                                 textAlign: TextAlign.start,
                                 style: AppStyles.s14w400,
+                              ),
+                              ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: grant.estimates?.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  var data = grant.estimates?[index];
+                                  return Text(data.actualR);
+                                },
                               ),
                             ],
                           ),

@@ -12,6 +12,7 @@ import 'package:googleauth/constants/app_colors_const.dart';
 import 'package:googleauth/constants/firebase_consts.dart';
 import 'package:googleauth/widgets/container16.dart';
 import 'package:googleauth/widgets/modal_bottom.dart';
+import 'package:googleauth/widgets/textfields.dart';
 import 'package:googleauth/widgets/toast.dart';
 
 import '../../Generators/uui_generator.dart';
@@ -29,6 +30,9 @@ class UserScreen extends StatefulWidget {
 }
 
 class _UserScreenState extends State<UserScreen> {
+  TextEditingController projectNameC = TextEditingController();
+  TextEditingController descC = TextEditingController();
+
   bool isLoading = false;
   late FToast fToast;
   String docId = UUIDGenerator().uuidV4();
@@ -62,6 +66,13 @@ class _UserScreenState extends State<UserScreen> {
     fToast.init(context);
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+    projectNameC.dispose();
+    descC.dispose();
+  }
+
   Future selectFile() async {
     final result = await FilePicker.platform.pickFiles();
     if (result == null) return;
@@ -77,7 +88,9 @@ class _UserScreenState extends State<UserScreen> {
       'docID': docId,
       'doc': doc,
       'postedDate': Timestamp.now(),
-      'docName': pickedFile!.name
+      'docName': pickedFile!.name,
+      'projectName': projectNameC.text,
+      'desc': descC.text
     }).then(
       (value) {
         setState(() {
@@ -115,7 +128,9 @@ class _UserScreenState extends State<UserScreen> {
           'docID': docId,
           'doc': doc,
           'postedDate': Timestamp.now(),
-          'docName': pickedFile!.name
+          'docName': pickedFile!.name,
+          'projectName': projectNameC.text,
+          'desc': descC.text
         })
         .then(
           (value) => fToast.showToast(
@@ -137,67 +152,96 @@ class _UserScreenState extends State<UserScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: const Text('Пользователь'),
       ),
-      body: Center(
-          child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Text('Welcome User'),
-          if (pickedFile != null) Text(pickedFile!.name),
-          Container16(
-              child: GeneralButton(
-                  isLoading: isLoading,
-                  text: 'Загрузить',
-                  onPressed: () {
-                    uploadFile();
-                  })),
-          GestureDetector(
-            onTap: (() {
-              FlexibleBottomSheet.flexBottomSheet(context, 0, 0, [
-                GestureDetector(
-                    onTap: () {
-                      selectFile();
-                      Navigator.pop(context);
-                    },
-                    child: const Text('Выбрать файл', style: AppStyles.s16w400))
-              ]);
-            }),
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              color: AppColors.white,
-              child: DottedBorder(
-                  borderType: BorderType.RRect,
-                  radius: const Radius.circular(4),
-                  dashPattern: const [4, 4],
-                  color: AppColors.primary,
-                  strokeWidth: 2,
-                  child: Container(
-                    color: AppColors.bg,
-                    width: double.maxFinite,
-                    padding: const EdgeInsets.symmetric(vertical: 40),
-                    child: Column(
-                      children: [
-                        SvgPicture.asset(AppAssets.svg.download),
-                        const SizedBox(height: 10),
-                        const Text('Добавьте свой документ',
-                            style: AppStyles.s16w400)
-                      ],
-                    ),
-                  )),
+      body: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // if (pickedFile != null) Text(pickedFile!.name),
+            GestureDetector(
+              onTap: (() {
+                FlexibleBottomSheet.flexBottomSheet(context, 0, 0, [
+                  GestureDetector(
+                      onTap: () {
+                        selectFile();
+                        Navigator.pop(context);
+                      },
+                      child:
+                          const Text('Выбрать файл', style: AppStyles.s16w400))
+                ]);
+              }),
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                color: AppColors.white,
+                child: DottedBorder(
+                    borderType: BorderType.RRect,
+                    radius: const Radius.circular(4),
+                    dashPattern: const [4, 4],
+                    color: AppColors.primary,
+                    strokeWidth: 2,
+                    child: Container(
+                      color: AppColors.bg,
+                      width: double.maxFinite,
+                      padding: const EdgeInsets.symmetric(vertical: 40),
+                      child: Column(
+                        children: [
+                          if (pickedFile != null) ...[
+                            Image.asset(AppAssets.images.doc, height: 72),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                pickedFile!.name,
+                                textAlign: TextAlign.center,
+                              ),
+                            )
+                          ],
+                          if (pickedFile == null) ...[
+                            SvgPicture.asset(AppAssets.svg.download),
+                            const SizedBox(height: 10),
+                            const Text('Добавьте свой документ',
+                                style: AppStyles.s16w400)
+                          ]
+                        ],
+                      ),
+                    )),
+              ),
             ),
-          ),
-          buildProgress(),
-          ElevatedButton(
-              onPressed: () async {
-                await authInstance.signOut();
-                // ignore: use_build_context_synchronously
-                changeScreenByRemove(context, const Login(), '/login');
-              },
-              child: const Text('Выйти'))
-        ],
-      )),
+            Container16(
+              child: CustomTextField(
+                hintText: 'Название проекта',
+                controller: projectNameC,
+              ),
+            ),
+            Container16(
+              child: CustomTextField(
+                hintText: 'Краткое описание',
+                controller: descC,
+                // keyboardType: TextInputType.multiline,
+                maxlines: null,
+              ),
+            ),
+            Container16(
+                bottom: 16,
+                child: GeneralButton(
+                    isLoading: isLoading,
+                    text: 'Загрузить',
+                    onPressed: () {
+                      uploadFile();
+                    })),
+            buildProgress(),
+            ElevatedButton(
+                onPressed: () async {
+                  await authInstance.signOut();
+                  // ignore: use_build_context_synchronously
+                  changeScreenByRemove(context, const Login(), '/login');
+                },
+                child: const Text('Выйти'))
+          ],
+        ),
+      ),
     );
   }
 

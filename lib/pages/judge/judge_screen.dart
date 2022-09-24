@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:googleauth/constants/firebase_consts.dart';
 import 'package:googleauth/models/grants.dart';
+import 'package:googleauth/pages/judge/judge_project_details.dart';
 import 'package:googleauth/widgets/app_global_loader_widget.dart';
 
 import '../../constants/app_assets.dart';
@@ -39,7 +40,7 @@ class _JudgeScreenState extends State<JudgeScreen> {
                             height: 30.0,
                           ),
                           const Text(
-                            "Сборщики сырья еще не зарегистрированы",
+                            "Грантов еще нет",
                             style: AppStyles.s16w400,
                           ),
                           SvgPicture.asset(AppAssets.svg.unselectedAvatar),
@@ -65,49 +66,43 @@ class _JudgeScreenState extends State<JudgeScreen> {
       AsyncSnapshot<QuerySnapshot> snapshot, GrantsModel grantsModel) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      child: Container(
-        child: GestureDetector(
-          child: Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            color: Colors.grey.shade100,
-            child: InkWell(
-              splashColor: Colors.blue.withAlpha(30),
-              onTap: () {},
-              child: snapshot.data?.docs.length == null
-                  ? Container()
-                  : Row(
-                      children: [
-                        const SizedBox(
-                          width: 10.0,
-                        ),
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () {
-                              // changeScreen(
-                              //     context,
-                              //     UserDocumentsList(
-                              //       userId: userModelClass.id,
-                              //     ));
-                            },
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(grantsModel.docName!,
-                                    style: AppStyles.s14w400),
-                                const SizedBox(
-                                  height: 5.0,
-                                ),
-                              ],
+      child: GestureDetector(
+        child: Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          color: Colors.grey.shade100,
+          child: InkWell(
+            splashColor: Colors.blue.withAlpha(30),
+            onTap: () {
+              changeScreen(
+                  context, JudgeProjectDetails(grantsModel: grantsModel));
+            },
+            child: snapshot.data?.docs.length == null
+                ? Container()
+                : Row(
+                    children: [
+                      const SizedBox(
+                        width: 10.0,
+                      ),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(grantsModel.userID!, style: AppStyles.s10w400),
+                            Text(grantsModel.projectName!,
+                                style: AppStyles.s14w400),
+                            Text(grantsModel.desc!, style: AppStyles.s14w400),
+                            const SizedBox(
+                              height: 5.0,
                             ),
-                          ),
+                          ],
                         ),
-                      ],
-                    ),
-            ),
+                      ),
+                    ],
+                  ),
           ),
         ),
       ),
@@ -117,21 +112,24 @@ class _JudgeScreenState extends State<JudgeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-          child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Text('Welcome Judge'),
-          grantsCard(),
-          ElevatedButton(
-              onPressed: () async {
-                await authInstance.signOut();
-                // ignore: use_build_context_synchronously
-                changeScreenByRemove(context, const Login(), '/login');
-              },
-              child: const Text('Выйти'))
-        ],
-      )),
+      appBar: AppBar(
+        title: const Text('Жюри'),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            grantsCard(),
+            ElevatedButton(
+                onPressed: () async {
+                  await authInstance.signOut();
+                  // ignore: use_build_context_synchronously
+                  changeScreenByRemove(context, const Login(), '/login');
+                },
+                child: const Text('Выйти'))
+          ],
+        ),
+      ),
     );
   }
 }

@@ -9,6 +9,7 @@ class _Images {
   final String form = 'assets/images/form.png';
   final String bitmap = 'assets/images/bitmap.png';
   final String photo = 'assets/images/photo.png';
+  final String doc = 'assets/images/doc.png';
 }
 
 class _Svg {
