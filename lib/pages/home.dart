@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:googleauth/main.dart';
+import 'package:googleauth/constants/firebase_consts.dart';
+import 'package:googleauth/pages/admin/admin_screen.dart';
+import 'package:googleauth/pages/judge/judge_screen.dart';
+import 'package:googleauth/pages/user/user_screen.dart';
+
+import '../constants/screen_navigation_const.dart';
+import 'login_screen.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key, this.accountType}) : super(key: key);
@@ -14,12 +20,11 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: accountType != 3
-            ? accountType == 1
-                ? const Center(child: Text('Welcome User'))
-                : const Center(child: Text('Welcome Judge'))
-            : const Center(child: Text('Welcome Admin')),
-      ),
+          child: widget.accountType != 3
+              ? widget.accountType == 1
+                  ? const UserScreen()
+                  : const JudgeScreen()
+              : const AdminScreen()),
     );
   }
 }

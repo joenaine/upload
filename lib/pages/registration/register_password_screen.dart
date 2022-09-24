@@ -5,7 +5,6 @@ import 'package:googleauth/constants/app_assets.dart';
 import 'package:googleauth/constants/app_colors_const.dart';
 import 'package:googleauth/constants/app_styles_const.dart';
 import 'package:googleauth/constants/screen_navigation_const.dart';
-import 'package:googleauth/pages/home.dart';
 import 'package:googleauth/pages/registration/fill_the_forms_screen.dart';
 import 'package:googleauth/pages/registration/provider/register_provider.dart';
 import 'package:googleauth/services/global_methods.dart';
@@ -14,6 +13,7 @@ import 'package:googleauth/widgets/textfields.dart';
 import 'package:provider/provider.dart';
 
 import '../../constants/firebase_consts.dart';
+import '../login_screen.dart';
 
 class PasswordRegistration extends StatefulWidget {
   const PasswordRegistration({Key? key}) : super(key: key);
@@ -26,10 +26,21 @@ class _PasswordRegistrationState extends State<PasswordRegistration> {
   final GlobalKey<FormState> _form = GlobalKey<FormState>();
   TextEditingController password = TextEditingController();
   TextEditingController passwordConfirm = TextEditingController();
-
+  int? accountType;
   bool onCorrespond = false;
   bool onLength = false;
   bool _isLoading = false;
+
+  geAccountType(String userID) async {
+    print("----------------------- CHECK ACCOUNT TYPE -----------------------");
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userID)
+        .get()
+        .then((value) {
+      accountType = value.data()?["accountType"];
+    });
+  }
 
   void _submitFormOnRegister() async {
     final regP = Provider.of<RegisterProvider>(context, listen: false);
@@ -39,9 +50,10 @@ class _PasswordRegistrationState extends State<PasswordRegistration> {
     });
 
     try {
-      await authInstance.createUserWithEmailAndPassword(
-          email: regP.email.text.toLowerCase().trim(),
-          password: password.text.trim());
+      UserCredential userCredential =
+          await authInstance.createUserWithEmailAndPassword(
+              email: regP.email.text.toLowerCase().trim(),
+              password: password.text.trim());
       final User? user = authInstance.currentUser;
       final uid = user!.uid;
       // user.updateDisplayName(regP.firstname.text);
@@ -62,7 +74,9 @@ class _PasswordRegistrationState extends State<PasswordRegistration> {
         'password': password.text,
         'createdAt': Timestamp.now(),
       });
-      changeScreen(context, const Home());
+      await geAccountType(userCredential.user!.uid.toString());
+      // ignore: use_build_context_synchronously
+      changeScreenByRemove(context, Login(accountType: accountType), '/login');
       print('Succefully registered');
     } on FirebaseException catch (error) {
       GlobalMethods.errorDialog(subtitle: '${error.message}', context: context);

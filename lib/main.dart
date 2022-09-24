@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 
 import 'constants/app_colors_const.dart';
 import 'constants/app_styles_const.dart';
+import 'pages/home.dart';
 import 'pages/login_screen.dart';
 
 final user = authInstance.currentUser;
@@ -15,7 +16,7 @@ int? accountType;
 
 Future<void> geAccountType() async {
   await FirebaseFirestore.instance
-      .collection('Users')
+      .collection('users')
       .doc(user?.uid)
       .get()
       .then((value) {
@@ -37,10 +38,23 @@ Future<void> main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  _mainPage() {
+    if (user == null) {
+      return const Login();
+    } else {
+      return Home(accountType: accountType);
+      //return PickTrashLocation();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -49,7 +63,7 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'izidos',
+        title: 'grant',
         theme: ThemeData(
             highlightColor: Colors.transparent,
             splashColor: Colors.transparent,
@@ -65,7 +79,7 @@ class MyApp extends StatelessWidget {
             fontFamily: 'Inter',
             backgroundColor: AppColors.bg,
             iconTheme: const IconThemeData(color: AppColors.dark)),
-        home: const Login(),
+        home: _mainPage(),
       ),
     );
   }

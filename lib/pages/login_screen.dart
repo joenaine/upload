@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:googleauth/constants/app_colors_const.dart';
@@ -15,22 +16,36 @@ import '../services/global_methods.dart';
 import 'registration/fill_the_forms_screen.dart';
 
 class Login extends StatefulWidget {
-  const Login({Key? key}) : super(key: key);
-
+  const Login({Key? key, this.accountType}) : super(key: key);
+  final int? accountType;
   @override
   State<Login> createState() => _LoginState();
 }
 
 class _LoginState extends State<Login> {
+  int? accountType;
   bool isLoading = false;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passController = TextEditingController();
 
   late FToast fToast;
+  geAccountType(String userID) async {
+    print("----------------------- CHECK ACCOUNT TYPE -----------------------");
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userID)
+        .get()
+        .then((value) {
+      accountType = value.data()?["accountType"];
+    });
+  }
 
   @override
   void initState() {
     super.initState();
+    if (widget.accountType != null) {
+      accountType = widget.accountType;
+    }
 
     fToast = FToast();
     fToast.init(context);
@@ -44,14 +59,16 @@ class _LoginState extends State<Login> {
       _isLoading = true;
     });
     try {
-      await authInstance.signInWithEmailAndPassword(
-          email: _emailController.text.toLowerCase().trim(),
-          password: _passController.text.trim());
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => const Home(),
-        ),
-      );
+      UserCredential userCredential =
+          await authInstance.signInWithEmailAndPassword(
+              email: _emailController.text.toLowerCase().trim(),
+              password: _passController.text.trim());
+      await geAccountType(userCredential.user!.uid.toString());
+      // Navigator.of(context).pushReplacement(
+      //   MaterialPageRoute(
+      //     builder: (context) => const Home(),
+      //   ),
+      // );
       print('Succefully logged in');
     } on FirebaseException catch (error) {
       GlobalMethods.errorDialog(subtitle: '${error.message}', context: context);
@@ -128,6 +145,11 @@ class _LoginState extends State<Login> {
 
   @override
   Widget build(BuildContext context) {
-    return loginDisplay();
+    final user = authInstance.currentUser;
+    return user != null
+        ? Home(
+            accountType: accountType,
+          )
+        : loginDisplay();
   }
 }
