@@ -1,7 +1,13 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:googleauth/constants/app_colors_const.dart';
 import 'package:googleauth/pages/app_nav_bar.dart';
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../../constants/app_assets.dart';
 import '../../constants/app_styles_const.dart';
@@ -17,6 +23,37 @@ class UserSubmits extends StatefulWidget {
 }
 
 class _UserSubmitsState extends State<UserSubmits> {
+  Future openFile({required String url, String? filename}) async {
+    final name = filename ?? url.split('/').last;
+    final file = await downloadFile(url, name);
+    if (file == null) return;
+
+    print(file.path);
+    OpenFile.open(file.path);
+  }
+
+  Future<File?> downloadFile(String url, String name) async {
+    final appStorage = await getApplicationDocumentsDirectory();
+    final file = File('${appStorage.path}/$name');
+
+    try {
+      final response = await Dio().get(
+        url,
+        options: Options(
+            responseType: ResponseType.bytes,
+            followRedirects: false,
+            receiveTimeout: 0),
+      );
+      final raf = file.openSync(mode: FileMode.write);
+      raf.writeFromSync(response.data);
+      await raf.close();
+
+      return file;
+    } catch (e) {
+      return null;
+    }
+  }
+
   final user = authInstance.currentUser;
   Widget grantsCard() {
     return SizedBox(
@@ -89,23 +126,109 @@ class _UserSubmitsState extends State<UserSubmits> {
                 ? Container()
                 : Row(
                     children: [
-                      const SizedBox(
-                        width: 10.0,
-                      ),
                       Expanded(
                         child: Container(
+                          color: AppColors.white,
                           padding: const EdgeInsets.all(16),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.start,
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Text(grantsModel.projectName!,
-                                  style: AppStyles.s14w400),
-                              Text(grantsModel.desc!, style: AppStyles.s14w400),
-                              const SizedBox(
-                                height: 5.0,
+                              Row(
+                                children: [
+                                  const Text("Название: ",
+                                      style: AppStyles.s16w500),
+                                  Text(grantsModel.projectName!,
+                                      style: AppStyles.s16w400
+                                          .copyWith(color: AppColors.primary)),
+                                ],
                               ),
+                              const SizedBox(height: 10),
+                              Row(
+                                children: [
+                                  const Text(
+                                    'Описание: ',
+                                    style: AppStyles.s16w500,
+                                  ),
+                                  Flexible(
+                                    child: Text(grantsModel.desc!,
+                                        style: AppStyles.s16w400.copyWith(
+                                            color: AppColors.textLight)),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 10),
+                              Row(
+                                children: [
+                                  const Text(
+                                    'Документ: ',
+                                    style: AppStyles.s16w500,
+                                  ),
+                                  if (grantsModel.doc != null)
+                                    Wrap(
+                                      children: [
+                                        InkWell(
+                                            onTap: () {
+                                              // UrlL.openUrl(widget.grantsModel!.doc!);
+                                              openFile(url: grantsModel.doc!);
+                                            },
+                                            child: Image.asset(
+                                              AppAssets.images.doc,
+                                              height: 26,
+                                            )),
+                                        Flexible(
+                                          child: SizedBox(
+                                            width: 120,
+                                            child: Text(
+                                              grantsModel.docName!,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                ],
+                              ),
+                              const SizedBox(height: 10),
+                              const Text(
+                                'Оценки жюри:',
+                                style: AppStyles.s16w500,
+                              ),
+                              const Divider(
+                                color: AppColors.textLight,
+                              ),
+                              if (grantsModel.estimates!.isNotEmpty)
+                                ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: grantsModel.estimates?.length,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    var grant = grantsModel.estimates?[index];
+                                    return Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        if (grant['judgeName'] != null)
+                                          Text(grant['judgeName'] +
+                                              ' ' +
+                                              grant['judgeLastname'] +
+                                              ': '),
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text('Идея: ${grant['ideaR']} '),
+                                            Text(
+                                                'План по реализации : ${grant['planR']}'),
+                                            Text(
+                                                'Актуальность: ${grant['actualR']}'),
+                                          ],
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                ),
                             ],
                           ),
                         ),

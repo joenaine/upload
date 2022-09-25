@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:googleauth/pages/profile_screen.dart';
 import 'package:googleauth/pages/user/user_screen.dart';
+import 'package:googleauth/pages/user/user_team.dart';
 
 import '../constants/app_assets.dart';
 import '../constants/app_colors_const.dart';
@@ -60,14 +61,14 @@ class AppNavBar extends StatelessWidget {
                     color: current == 1
                         ? AppColors.primary
                         : Colors.grey.shade300),
-                Text('сообщества',
+                Text('Команда',
                     style: AppStyles.s10w400.copyWith(
                         color: current == 1
                             ? AppColors.primary
                             : Colors.grey.shade300))
               ],
             ),
-            label: 'сообщества'),
+            label: 'Команда'),
         BottomNavigationBarItem(
             icon: Column(
               children: [
@@ -80,11 +81,11 @@ class AppNavBar extends StatelessWidget {
         BottomNavigationBarItem(
             icon: Column(
               children: [
-                SvgPicture.asset(AppAssets.svg.users,
+                SvgPicture.asset(AppAssets.svg.oferta,
                     color: current == 3
                         ? AppColors.primary
                         : Colors.grey.shade300),
-                Text('Игроки',
+                Text('Проекты',
                     style: AppStyles.s10w400.copyWith(
                         color: current == 3
                             ? AppColors.primary
@@ -116,7 +117,7 @@ class AppNavBar extends StatelessWidget {
               _createRoute(const UserHome()), (route) => false);
         } else if (index == 1) {
           Navigator.of(context).pushAndRemoveUntil(
-              _createRoute(const UserScreen()), (route) => false);
+              _createRoute(const UserTeam()), (route) => false);
         } else if (index == 2) {
           Navigator.of(context).pushAndRemoveUntil(
               _createRoute(const UserScreen()), (route) => false);
