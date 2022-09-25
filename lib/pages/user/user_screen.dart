@@ -10,6 +10,8 @@ import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:googleauth/constants/app_colors_const.dart';
 import 'package:googleauth/constants/firebase_consts.dart';
+import 'package:googleauth/pages/app_nav_bar.dart';
+import 'package:googleauth/pages/registration/widgets/register_success_screen.dart';
 import 'package:googleauth/widgets/container16.dart';
 import 'package:googleauth/widgets/modal_bottom.dart';
 import 'package:googleauth/widgets/textfields.dart';
@@ -102,7 +104,7 @@ class _UserScreenState extends State<UserScreen> {
           gravity: ToastGravity.BOTTOM,
           toastDuration: const Duration(seconds: 2),
         );
-        changeScreenByRemove(context, const UserScreen(), '/user');
+        changeScreenByRemove(context, const SuccessPage(), '/user');
       },
     ).catchError(
       (error) {
@@ -153,15 +155,39 @@ class _UserScreenState extends State<UserScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      // resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: const Text('Пользователь'),
+        title: const Text('Подача заявления  на грант'),
       ),
+      bottomNavigationBar: const AppNavBar(current: 2),
+      bottomSheet: Container16(
+          bottom: 16,
+          child: GeneralButton(
+              isLoading: isLoading,
+              text: 'Загрузить',
+              onPressed: () {
+                uploadFile();
+              })),
       body: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // if (pickedFile != null) Text(pickedFile!.name),
+            Container16(
+              child: CustomTextField(
+                hintText: 'Название проекта',
+                controller: projectNameC,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Container16(
+              child: CustomTextField(
+                hintText: 'Краткое описание',
+                controller: descC,
+                // keyboardType: TextInputType.multiline,
+                maxlines: null,
+              ),
+            ),
+            const SizedBox(height: 8),
             GestureDetector(
               onTap: (() {
                 FlexibleBottomSheet.flexBottomSheet(context, 0, 0, [
@@ -210,28 +236,6 @@ class _UserScreenState extends State<UserScreen> {
                     )),
               ),
             ),
-            Container16(
-              child: CustomTextField(
-                hintText: 'Название проекта',
-                controller: projectNameC,
-              ),
-            ),
-            Container16(
-              child: CustomTextField(
-                hintText: 'Краткое описание',
-                controller: descC,
-                // keyboardType: TextInputType.multiline,
-                maxlines: null,
-              ),
-            ),
-            Container16(
-                bottom: 16,
-                child: GeneralButton(
-                    isLoading: isLoading,
-                    text: 'Загрузить',
-                    onPressed: () {
-                      uploadFile();
-                    })),
             buildProgress(),
             ElevatedButton(
                 onPressed: () async {

@@ -3,7 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:googleauth/constants/app_assets.dart';
 import 'package:googleauth/constants/app_colors_const.dart';
 import 'package:googleauth/constants/app_styles_const.dart';
-import 'package:googleauth/pages/login_screen.dart';
+import 'package:googleauth/pages/user/user_screen.dart';
 import 'package:googleauth/widgets/general_button.dart';
 
 class SuccessPage extends StatelessWidget {
@@ -22,18 +22,19 @@ class SuccessPage extends StatelessWidget {
             const SizedBox(height: 20),
             const Text('Поздравляем!', style: AppStyles.s24w600),
             const SizedBox(height: 4),
-            Text('Регистрация прошла успешно',
+            Text('Ваш проект успешно отправлен',
                 style: AppStyles.s16w400.copyWith(color: AppColors.textLight)),
             const SizedBox(height: 40),
             SizedBox(
-              width: 140,
+              width: 170,
               child: GeneralButton(
-                  text: 'На главную',
+                  text: 'Вернуться назад',
                   onPressed: () {
                     Navigator.pushAndRemoveUntil(
                         context,
-                        MaterialPageRoute(builder: (context) => const Login()),
-                        ModalRoute.withName("/login"));
+                        MaterialPageRoute(
+                            builder: (context) => const UserScreen()),
+                        ModalRoute.withName("/user-screen"));
                   }),
             )
           ],
